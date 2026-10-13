@@ -27,7 +27,7 @@ jobs:
             exit 0
           fi
           # Surface the errors as annotations so they're readable without the full log.
-          grep -E '^e: |error:|Could not|Unresolved|> ' build.log | head -40 > errors.txt || true
+          grep -E '^e: |error:|Could not|Unresolved' build.log | grep -v '> Task' | head -40 > errors.txt || true
           awk '/What went wrong/{f=1} f{print} /Try:/{if(f) exit}' build.log | head -30 >> errors.txt || true
           split -l 8 errors.txt chunk_
           for f in chunk_*; do
