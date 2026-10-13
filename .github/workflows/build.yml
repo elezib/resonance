@@ -4,6 +4,9 @@ on:
   push:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -36,8 +39,22 @@ jobs:
           done
           exit 1
 
+      - name: Name the APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk Resonance.apk
+
       - name: Upload the APK
         uses: actions/upload-artifact@v4
         with:
           name: Resonance-APK
-          path: app/build/outputs/apk/debug/*.apk
+          path: Resonance.apk
+
+      # Publish a direct download link: .../releases/latest/download/Resonance.apk
+      - name: Publish release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Resonance build ${{ github.run_number }}
+          body: Install Resonance.apk on your Android phone.
+          files: Resonance.apk
+          make_latest: true
